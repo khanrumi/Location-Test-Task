@@ -1,0 +1,52 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model State {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  cities        City[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model City {
+  id            Int      @id @default(autoincrement())
+  name          String
+  state         State    @relation(fields: [stateId], references: [id])
+  stateId       Int
+  neighborhoods Neighborhood[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([name, stateId])
+}
+
+model Neighborhood {
+  id            Int      @id @default(autoincrement())
+  name          String
+  city          City     @relation(fields: [cityId], references: [id])
+  cityId        Int
+  addresses     Address[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([name, cityId])
+}
+
+model Address {
+  id            Int           @id @default(autoincrement())
+  address       String
+  neighborhood  Neighborhood  @relation(fields: [neighborhoodId], references: [id])
+  neighborhoodId Int
+  googleSearch  String?
+  phone         String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
